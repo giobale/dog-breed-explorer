@@ -1,0 +1,279 @@
+# ==============================================================================
+# DATA PLATFORM - GITIGNORE
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Terraform
+# ------------------------------------------------------------------------------
+# State files
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Terraform directory
+.terraform/
+.terraform.lock.hcl
+
+# Sensitive variables
+**/secrets.tfvars
+terraform.tfvars.backup
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc
+
+# ------------------------------------------------------------------------------
+# Python
+# ------------------------------------------------------------------------------
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Virtual environments
+venv/
+.venv/
+ENV/
+env/
+.env/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# ------------------------------------------------------------------------------
+# Secrets & Credentials
+# ------------------------------------------------------------------------------
+# Environment files
+.env
+.env.*
+*.env
+!.env.example
+
+# GCP Service Account keys
+*-key.json
+**/*-key.json
+*-sa-key.json
+**/*-sa-key.json
+**/service-account*.json
+credentials.json
+key.json
+
+# API keys and tokens
+*.key
+*.pem
+*.p12
+secrets/
+.secrets/
+
+# ------------------------------------------------------------------------------
+# dbt
+# ------------------------------------------------------------------------------
+# dbt compilation outputs
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+dbt/.user.yml
+
+# dbt artifacts
+dbt/run_results.json
+dbt/manifest.json
+dbt/catalog.json
+
+# ------------------------------------------------------------------------------
+# Docker
+# ------------------------------------------------------------------------------
+# Docker compose override
+docker-compose.override.yml
+
+# ------------------------------------------------------------------------------
+# IDEs & Editors
+# ------------------------------------------------------------------------------
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.*.sw?
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ------------------------------------------------------------------------------
+# Operating Systems
+# ------------------------------------------------------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+.nfs*
+
+# ------------------------------------------------------------------------------
+# Logs
+# ------------------------------------------------------------------------------
+*.log
+logs/
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ------------------------------------------------------------------------------
+# Temporary Files
+# ------------------------------------------------------------------------------
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*~
+
+# ------------------------------------------------------------------------------
+# Data Files (local testing)
+# ------------------------------------------------------------------------------
+# CSV, JSON, Parquet files used for testing
+*.csv
+*.json
+!dbt/seeds/*.csv
+!**/.dbt/*.json
+!**/dbt_project.yml
+!**/profiles.yml
+!**/.github/**/*.json
+*.parquet
+*.avro
+data/
+sample_data/
+
+# ------------------------------------------------------------------------------
+# Cloud Run / Container Registry
+# ------------------------------------------------------------------------------
+# Local Docker build artifacts
+.dockerignore.backup
+
+# ------------------------------------------------------------------------------
+# GitHub Actions
+# ------------------------------------------------------------------------------
+# Act (local GitHub Actions testing)
+.act/
+
+# ------------------------------------------------------------------------------
+# Misc
+# ------------------------------------------------------------------------------
+# Archive files
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Node modules (if using any JS tools)
+node_modules/
+
+# Lock files
+package-lock.json
+yarn.lock
