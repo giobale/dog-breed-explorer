@@ -155,6 +155,9 @@ docker-compose.override.yml
 .vscode/
 *.code-workspace
 
+#CLAUDE files
+.claude/
+
 # PyCharm
 .idea/
 *.iml
