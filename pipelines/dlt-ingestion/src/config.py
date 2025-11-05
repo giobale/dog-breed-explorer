@@ -52,10 +52,15 @@ class PipelineConfig:
                 load_dotenv(dotenv_path=dotenv_path)
                 logger.info(f"Loaded .env from: {dotenv_path}")
             else:
-                raise FileNotFoundError(
-                    f".env file not found at: {dotenv_path}. "
-                    f"Project root: {project_root}"
-                )
+                # .env file not found - check if running in containerized environment
+                # In Docker, environment variables are passed directly via --env-file
+                if os.getenv("GCP_PROJECT_ID"):
+                    logger.info("No .env file found, but GCP_PROJECT_ID env var is set (likely running in container)")
+                else:
+                    raise FileNotFoundError(
+                        f".env file not found at: {dotenv_path}. "
+                        f"Project root: {project_root}"
+                    )
 
             credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
             if credentials_path:

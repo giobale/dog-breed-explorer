@@ -2,6 +2,7 @@
 # ABOUTME: Handles configuration loading, pipeline execution, error handling, and logging.
 
 import logging
+import os
 import sys
 from typing import Dict, Any
 
@@ -37,17 +38,46 @@ def run_pipeline() -> Dict[str, Any]:
 
         logger.info(f"Fetching data from: {config.full_api_url}")
 
-        pipeline = dlt.pipeline(
-            pipeline_name="dog_breeds_pipeline",
-            destination="bigquery",
-            dataset_name=config.bigquery_dataset,
-        )
+        # Configure BigQuery credentials from service account JSON file
+        credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+        if credentials_path:
+            logger.info(f"Using BigQuery credentials from: {credentials_path}")
+
+            # Read and parse the service account JSON file
+            import json
+            with open(credentials_path, 'r') as f:
+                creds_dict = json.load(f)
+
+            # Create dlt credentials object from the JSON
+            from dlt.common.configuration.specs import GcpServiceAccountCredentials
+            credentials = GcpServiceAccountCredentials(
+                project_id=creds_dict['project_id'],
+                private_key=creds_dict['private_key'],
+                client_email=creds_dict['client_email']
+            )
+
+            # Create pipeline with explicit credentials
+            pipeline = dlt.pipeline(
+                pipeline_name="dog_breeds_pipeline",
+                destination=dlt.destinations.bigquery(credentials=credentials),
+                dataset_name=config.bigquery_dataset,
+            )
+        else:
+            logger.info("Using default BigQuery credentials (ADC)")
+            # Create pipeline without explicit credentials (uses ADC)
+            pipeline = dlt.pipeline(
+                pipeline_name="dog_breeds_pipeline",
+                destination="bigquery",
+                dataset_name=config.bigquery_dataset,
+            )
 
         logger.info(f"Pipeline will create dataset '{config.bigquery_dataset}' if it doesn't exist")
 
-        source = dog_breeds_source(api_url=config.full_api_url)
+        #returns the dog_breeds_resource generator.
+        source = dog_breeds_source(api_url=config.full_api_url) 
 
         logger.info("Running dlt pipeline")
+        #executes the whole ETL for that source
         load_info = pipeline.run(source)
 
         logger.info("Pipeline execution completed successfully")

@@ -11,7 +11,8 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-
+#dlt.resource decorator turns your plain Python function into a DLT resource—a loadable data stream with schema, load options, and lifecycle that the pipeline can manage.
+#without the decorator it’s just a generator function; with @dlt.resource it becomes a first-class ETL unit that DLT can discover, type, batch, and load into BigQuery with the behavior you specified.
 @dlt.source
 def dog_breeds_source(api_url: str) -> Any:
     """
@@ -35,7 +36,7 @@ def dog_breeds_source(api_url: str) -> Any:
         "updated_at": {"data_type": "timestamp"},
     },
 )
-def dog_breeds_resource(api_url: str) -> Iterator[Dict[str, Any]]:
+def dog_breeds_resource(api_url: str) -> Iterator[Dict[str, Any]]: #look that an iterator gets returned
     """
     Fetch dog breeds from API and transform to target schema.
 
@@ -43,7 +44,7 @@ def dog_breeds_resource(api_url: str) -> Iterator[Dict[str, Any]]:
     as-is without any parsing or modification. Each breed JSON object is stored in its
     entirety in the breed_json column.
 
-    write_disposition="replace" ensures that each pipeline run replaces all existing
+     -> write_disposition="replace" ensures that each pipeline run replaces all existing
     data in the table, guaranteeing the dataset always contains the latest API response.
 
     Args:
@@ -68,7 +69,9 @@ def dog_breeds_resource(api_url: str) -> Iterator[Dict[str, Any]]:
 
         timestamp = datetime.now(timezone.utc)
         logger.info(f"Pipeline will REPLACE existing data (write_disposition=replace)")
-
+        #As soon as Python sees yield inside a function, calling that function returns an iterator (a generator object) instead of running everything at once.
+        #Produces values one at a time. Each yield hands one value to the caller and pauses the function, keeping its local variables and execution state.
+        #A return ends the function immediately. With yield, you can produce many values over time.
         for row_id, breed in enumerate(breeds_data, start=1):
             yield {
                 "row_id": row_id,

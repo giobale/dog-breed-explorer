@@ -1,0 +1,30 @@
+# ABOUTME: Docker Compose configuration for local development and testing of dlt pipeline.
+# ABOUTME: Loads environment variables from root .env file and mounts service account credentials.
+
+version: '3.8'
+
+services:
+  dlt-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dlt-dog-breeds-pipeline:local
+    container_name: dlt-dog-breeds-local
+    env_file:
+      - ../../.env
+    environment:
+      # Override DLT data directory for container
+      - DLT_DATA_DIR=/app/src/.dlt
+      # Ensure JSON credentials path is correct in container
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/service-account.json
+    volumes:
+      # Mount service account credentials from local machine into container
+      - ${GOOGLE_APPLICATION_CREDENTIALS}:/app/credentials/service-account.json:ro
+      # Mount .dlt directory for state persistence (optional)
+      - ./.dlt:/app/src/.dlt
+    networks:
+      - dlt-network
+
+networks:
+  dlt-network:
+    driver: bridge
