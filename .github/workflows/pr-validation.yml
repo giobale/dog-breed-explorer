@@ -48,10 +48,15 @@ jobs:
         with:
           skip_install: false
 
-      - name: Configure gcloud auth
+      - name: Debug authentication
         run: |
-          # Ensure gcloud uses the Workload Identity credentials directly
-          gcloud config set auth/impersonate_service_account ""
+          echo "=== Debug Info ==="
+          echo "GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS}"
+          echo "Credentials file type:"
+          head -5 "${GOOGLE_APPLICATION_CREDENTIALS}"
+          echo "=== gcloud config ==="
+          gcloud config list
+          echo "=== Auth accounts ==="
           gcloud auth list
 
       - name: Retrieve secrets from Secret Manager
