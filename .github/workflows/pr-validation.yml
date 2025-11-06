@@ -45,19 +45,6 @@ jobs:
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
-        with:
-          skip_install: false
-
-      - name: Debug authentication
-        run: |
-          echo "=== Debug Info ==="
-          echo "GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS}"
-          echo "Credentials file type:"
-          head -5 "${GOOGLE_APPLICATION_CREDENTIALS}"
-          echo "=== gcloud config ==="
-          gcloud config list
-          echo "=== Auth accounts ==="
-          gcloud auth list
 
       - name: Retrieve secrets from Secret Manager
         id: secrets
