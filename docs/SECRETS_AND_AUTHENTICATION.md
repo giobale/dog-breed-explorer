@@ -40,11 +40,24 @@ This document explains how secrets are stored, managed, and accessed across the 
 
 The platform stores three secrets in Secret Manager:
 
-| Secret ID | Description | Used By |
-|-----------|-------------|---------|
-| `dlt-service-account-key` | Service account JSON key with BigQuery permissions | dlt pipeline (local, CI/CD, Cloud Run) |
-| `dog-api-base-url` | Base URL for The Dog API | dlt pipeline |
-| `dog-api-endpoint` | API endpoint path for dog breeds | dlt pipeline |
+| Secret ID | Description | Value/Content | Used By |
+|-----------|-------------|---------------|---------|
+| `dlt-service-account-key` | Service account JSON key for `terraform-deploy@pyne-de-assignemet.iam.gserviceaccount.com` | Contents of `pyne-de-assignemet-tf-service-account-key.json` | dlt pipeline (local, CI/CD, Cloud Run) |
+| `dog-api-base-url` | Base URL for The Dog API | `https://api.thedogapi.com/v1` | dlt pipeline |
+| `dog-api-endpoint` | API endpoint path for dog breeds | `breeds` | dlt pipeline |
+
+**Important Note**: The platform currently uses a **single service account** (`terraform-deploy@pyne-de-assignemet.iam.gserviceaccount.com`) for both Terraform infrastructure deployment and dlt pipeline execution. This service account has broad permissions:
+
+- `roles/artifactregistry.admin` - Push/pull container images
+- `roles/bigquery.admin` - Create/manage BigQuery datasets and tables
+- `roles/cloudbuild.builds.editor` - Manage Cloud Build jobs
+- `roles/cloudscheduler.admin` - Manage Cloud Scheduler jobs
+- `roles/iam.serviceAccountUser` - Act as service accounts
+- `roles/run.admin` - Manage Cloud Run jobs
+- `roles/secretmanager.admin` - Manage Secret Manager secrets
+- `roles/storage.admin` - Manage Cloud Storage buckets
+
+The key file (`pyne-de-assignemet-tf-service-account-key.json`) is stored locally in the project root and is also uploaded to Secret Manager as `dlt-service-account-key` for use by GitHub Actions and Cloud Run Jobs. **Note**: This file itself is NOT stored in Secret Manager - only its contents are stored as the secret value.
 
 ### Managing Secrets with Terraform
 
@@ -72,7 +85,7 @@ cd infrastructure
 
 # Create secrets.tfvars with your values
 cat > secrets.tfvars <<EOF
-service_account_key_path = "../keys/pyne-de-assignemet-dlt-sa-key.json"
+service_account_key_path = "../pyne-de-assignemet-tf-service-account-key.json"
 dog_api_base_url = "https://api.thedogapi.com/v1"
 dog_api_endpoint = "breeds"
 github_actions_service_account_email = "github-actions@pyne-de-assignemet.iam.gserviceaccount.com"
@@ -82,6 +95,8 @@ EOF
 terraform init
 terraform apply -var-file="secrets.tfvars" -var="project_id=pyne-de-assignemet"
 ```
+
+**Note**: The `service_account_key_path` points to `pyne-de-assignemet-tf-service-account-key.json` in the project root directory, which contains the key for `terraform-deploy@pyne-de-assignemet.iam.gserviceaccount.com`.
 
 ### IAM Permissions for Secrets
 
@@ -236,7 +251,7 @@ After authentication, the workflow retrieves secrets from Secret Manager:
     echo "DOG_API_ENDPOINT=$DOG_API_ENDPOINT" >> $GITHUB_ENV
 ```
 
-**Important**: The workflow overwrites `GOOGLE_APPLICATION_CREDENTIALS` with the DLT service account key retrieved from Secret Manager. This is because the dlt pipeline needs to authenticate as the DLT service account (which has BigQuery permissions), not the GitHub Actions service account.
+**Important**: The workflow overwrites `GOOGLE_APPLICATION_CREDENTIALS` with the service account key retrieved from Secret Manager. This key is for `terraform-deploy@pyne-de-assignemet.iam.gserviceaccount.com`, which has the necessary BigQuery, Artifact Registry, and other permissions required by the dlt pipeline. The GitHub Actions service account (`github-actions@pyne-de-assignemet.iam.gserviceaccount.com`) is only used for authentication to GCP and accessing Secret Manager - the actual pipeline execution uses the `terraform-deploy` service account.
 
 ---
 
@@ -248,12 +263,14 @@ For local development, create a `.env` file in the project root:
 
 ```bash
 # .env
-GOOGLE_APPLICATION_CREDENTIALS=keys/pyne-de-assignemet-dlt-sa-key.json
+GOOGLE_APPLICATION_CREDENTIALS=pyne-de-assignemet-tf-service-account-key.json
 DOG_API_BASE_URL=https://api.thedogapi.com/v1
 DOG_API_ENDPOINT=breeds
 BIGQUERY_DATASET=dog_breeds_raw
 GCP_PROJECT_ID=pyne-de-assignemet
 ```
+
+**Note**: The `GOOGLE_APPLICATION_CREDENTIALS` path points to the `terraform-deploy` service account key file in the project root. This same service account is used for both Terraform operations and dlt pipeline execution.
 
 The dlt pipeline's `config.py` loads these environment variables:
 
@@ -394,12 +411,12 @@ gcloud projects add-iam-policy-binding pyne-de-assignemet \
 
 **Symptom**: Local pipeline fails with "Service account key file not found".
 
-**Cause**: `.env` file has wrong path to service account key.
+**Cause**: `.env` file has wrong path to service account key or file doesn't exist.
 
 **Solution**:
-1. Verify key file exists: `ls keys/pyne-de-assignemet-dlt-sa-key.json`
-2. Update `.env` with correct relative path from project root
-3. Ensure path is relative, not absolute (for portability)
+1. Verify key file exists in project root: `ls pyne-de-assignemet-tf-service-account-key.json`
+2. Update `.env` with correct path: `GOOGLE_APPLICATION_CREDENTIALS=pyne-de-assignemet-tf-service-account-key.json`
+3. Ensure path is relative to project root (where pipeline is executed from)
 
 ---
 
