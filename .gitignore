@@ -143,6 +143,20 @@ dbt/manifest.json
 dbt/catalog.json
 
 # ------------------------------------------------------------------------------
+# dlt (data load tool)
+# ------------------------------------------------------------------------------
+# dlt pipeline state and runtime files
+**/.dlt/pipelines/
+**/.dlt/state.json
+**/.dlt/trace.pickle
+
+# dlt secrets (credentials should use environment variables or Secret Manager)
+**/.dlt/secrets.toml
+
+# dlt config (can be committed if no sensitive data, but typically environment-specific)
+# **/.dlt/config.toml
+
+# ------------------------------------------------------------------------------
 # Docker
 # ------------------------------------------------------------------------------
 # Docker compose override
@@ -154,6 +168,9 @@ docker-compose.override.yml
 # Visual Studio Code
 .vscode/
 *.code-workspace
+
+#CLAUDE files
+.claude/
 
 # PyCharm
 .idea/

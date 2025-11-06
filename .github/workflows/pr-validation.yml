@@ -1,0 +1,101 @@
+# ABOUTME: GitHub Actions workflow for validating pull requests before merge.
+# ABOUTME: Runs tests for dlt pipeline using PR-specific BigQuery dataset and Secret Manager credentials.
+
+name: PR Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+    paths:
+      - 'pipelines/dlt-ingestion/**'
+      - '.github/workflows/pr-validation.yml'
+
+# Required secrets (configured in GitHub repo settings):
+# - GCP_PROJECT_ID: Google Cloud Project ID
+# - GCP_WORKLOAD_IDENTITY_PROVIDER: Workload Identity Provider for GitHub Actions
+# - GCP_SERVICE_ACCOUNT: Service account email for authentication
+
+jobs:
+  test-dlt-pipeline:
+    name: Test DLT Pipeline
+    runs-on: ubuntu-latest
+
+    # Allow GitHub Actions to authenticate with GCP using Workload Identity
+    permissions:
+      contents: read
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: pipelines/dlt-ingestion
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+          export_environment_variables: true
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Retrieve secrets from Secret Manager
+        id: secrets
+        run: |
+          # Retrieve service account key from Secret Manager
+          gcloud secrets versions access latest --secret="dlt-service-account-key" --project=${{ secrets.GCP_PROJECT_ID }} > /tmp/service-account.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=/tmp/service-account.json" >> $GITHUB_ENV
+
+          # Retrieve environment variables from Secret Manager
+          DOG_API_BASE_URL=$(gcloud secrets versions access latest --secret="dog-api-base-url" --project=${{ secrets.GCP_PROJECT_ID }})
+          DOG_API_ENDPOINT=$(gcloud secrets versions access latest --secret="dog-api-endpoint" --project=${{ secrets.GCP_PROJECT_ID }})
+
+          echo "DOG_API_BASE_URL=$DOG_API_BASE_URL" >> $GITHUB_ENV
+          echo "DOG_API_ENDPOINT=$DOG_API_ENDPOINT" >> $GITHUB_ENV
+
+      - name: Set PR-specific dataset name
+        run: |
+          # Create dataset name with PR number for isolated testing
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          DATASET_NAME="dog_breeds_raw_pr_${PR_NUMBER}"
+          echo "BIGQUERY_DATASET=$DATASET_NAME" >> $GITHUB_ENV
+          echo "::notice::Using BigQuery dataset: $DATASET_NAME"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'pipelines/dlt-ingestion/requirements.txt'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run integration test with PR dataset
+        run: |
+          pytest tests/test_bigquery_integration.py -v -s
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Cleanup PR dataset
+        if: always()
+        run: |
+          # Delete the PR-specific dataset after tests complete
+          DATASET_NAME="dog_breeds_raw_pr_${{ github.event.pull_request.number }}"
+          bq rm -r -f -d "${GCP_PROJECT_ID}:${DATASET_NAME}" || echo "Dataset cleanup skipped or already deleted"
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Test results summary
+        if: always()
+        run: |
+          echo "::notice::DLT pipeline tests completed for PR #${{ github.event.pull_request.number }}"
