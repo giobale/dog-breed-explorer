@@ -45,17 +45,25 @@ jobs:
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
+        with:
+          skip_install: false
+
+      - name: Configure gcloud auth
+        run: |
+          # Ensure gcloud uses the Workload Identity credentials directly
+          gcloud config set auth/impersonate_service_account ""
+          gcloud auth list
 
       - name: Retrieve secrets from Secret Manager
         id: secrets
         run: |
           # Retrieve service account key from Secret Manager
-          gcloud secrets versions access latest --secret="dlt-service-account-key" > /tmp/service-account.json
+          gcloud secrets versions access latest --secret="dlt-service-account-key" --project=${{ secrets.GCP_PROJECT_ID }} > /tmp/service-account.json
           echo "GOOGLE_APPLICATION_CREDENTIALS=/tmp/service-account.json" >> $GITHUB_ENV
 
           # Retrieve environment variables from Secret Manager
-          DOG_API_BASE_URL=$(gcloud secrets versions access latest --secret="dog-api-base-url")
-          DOG_API_ENDPOINT=$(gcloud secrets versions access latest --secret="dog-api-endpoint")
+          DOG_API_BASE_URL=$(gcloud secrets versions access latest --secret="dog-api-base-url" --project=${{ secrets.GCP_PROJECT_ID }})
+          DOG_API_ENDPOINT=$(gcloud secrets versions access latest --secret="dog-api-endpoint" --project=${{ secrets.GCP_PROJECT_ID }})
 
           echo "DOG_API_BASE_URL=$DOG_API_BASE_URL" >> $GITHUB_ENV
           echo "DOG_API_ENDPOINT=$DOG_API_ENDPOINT" >> $GITHUB_ENV
