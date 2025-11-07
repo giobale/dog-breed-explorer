@@ -1,0 +1,20 @@
+# ABOUTME: Python dependencies for running the dbt dog breeds analytics project
+# ABOUTME: Install with: pip install -r requirements.txt
+
+# dbt Core with BigQuery adapter
+dbt-bigquery==1.7.4
+
+# Google Cloud dependencies (installed with dbt-bigquery but pinned for clarity)
+google-cloud-bigquery>=3.11.0,<4.0.0
+google-auth>=2.23.0,<3.0.0
+google-auth-oauthlib>=1.1.0,<2.0.0
+
+# Additional dbt utilities (optional but recommended)
+dbt-osmosis>=0.11.0  # For dbt documentation and YAML management
+
+# Testing and validation
+sqlfluff>=2.3.0  # SQL linting
+sqlfluff-templater-dbt>=2.3.0  # dbt templating support for sqlfluff
+
+# Development tools
+pre-commit>=3.5.0  # Git hooks for quality checks

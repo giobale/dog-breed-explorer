@@ -1,0 +1,9 @@
+# ABOUTME: dbt package dependencies for testing utilities and data quality checks
+# ABOUTME: Includes dbt-utils and dbt-expectations for comprehensive test coverage
+
+packages:
+  - package: dbt-labs/dbt_utils
+    version: 1.1.1
+
+  - package: calogica/dbt_expectations
+    version: 0.10.1
