@@ -41,12 +41,12 @@ module "secret_manager" {
 }
 
 # DLT Ingestion module - Creates Cloud Run jobs for data ingestion
-# Uncomment when ready to deploy
-# module "dlt_ingestion" {
-#   source = "./modules/dlt-ingestion"
-#
-#   project_id         = var.project_id
-#   region             = var.region
-#   service_account_email = var.dlt_service_account_email
-#   container_image    = var.dlt_container_image
-# }
+module "dlt_ingestion" {
+  source = "./modules/dlt-ingestion"
+
+  project_id            = var.project_id
+  region                = var.region
+  service_account_email = var.dlt_service_account_email
+  container_image       = var.dlt_container_image
+  schedule              = var.dlt_schedule
+}
