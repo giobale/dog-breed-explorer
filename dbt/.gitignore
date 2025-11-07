@@ -1,0 +1,9 @@
+# ABOUTME: Git ignore file for dbt project to exclude build artifacts and dependencies
+# ABOUTME: Prevents committing temporary files, compiled code, and sensitive data
+
+target/
+dbt_packages/
+logs/
+*.log
+.user.yml
+profiles.yml

@@ -1,0 +1,84 @@
+# ABOUTME: dbt project configuration for dog breeds data pipeline
+# ABOUTME: Defines project structure, materialization strategies, and layer-specific settings
+
+name: 'dog_breeds_analytics'
+version: '1.0.0'
+config-version: 2
+
+# Project profile - references the profile in ~/.dbt/profiles.yml
+profile: 'pyne-assignement-bigquery-db'
+
+# Directories for dbt artifacts
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+# Build artifacts
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Model configurations
+models:
+  dog_breeds_analytics:
+    # Silver layer: intermediate transformations, materialized as views
+    silver:
+      +schema: dog_breeds_silver
+      +materialized: view
+      +tags: ["silver", "intermediate"]
+      +on_schema_change: "fail"
+      +docs:
+        node_color: "#87CEEB"
+
+    # Gold layer: refined analytics-ready tables, materialized as tables
+    gold:
+      +schema: dog_breeds_gold
+      +materialized: table
+      +tags: ["gold", "analytics"]
+      +on_schema_change: "fail"
+      +docs:
+        node_color: "#FFD700"
+
+# Test configurations
+tests:
+  +store_failures: false
+
+# Documentation
+docs-paths: ["docs"]
+
+# Seeds configuration
+seeds:
+  +schema: seeds
+  +docs:
+    node_color: "#90EE90"
+
+# Snapshot configuration
+snapshots:
+  +target_schema: snapshots
+  +unique_key: id
+  +strategy: timestamp
+  +updated_at: updated_at
+
+# Variables that can be referenced in models
+vars:
+  # Weight class boundaries in kg (metric)
+  weight_classes:
+    extra_small: {"min": 0, "max": 5}
+    small: {"min": 5, "max": 10}
+    medium: {"min": 10, "max": 25}
+    large: {"min": 25, "max": 40}
+    extra_large: {"min": 40, "max": 100}
+
+# Query comments for audit trail
+query-comment:
+  comment: "dbt_run | {{ dbt_version }} | {{ target.name }} | {{ invocation_id }}"
+  append: true
+
+# Dispatch configuration for cross-database compatibility
+dispatch:
+  - macro_namespace: dbt
+    search_order: ['dog_breeds_analytics', 'dbt']
