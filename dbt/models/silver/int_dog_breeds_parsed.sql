@@ -27,7 +27,7 @@ parsed_breeds AS (
         JSON_EXTRACT_SCALAR(breed_json, '$.name') AS breed_name,
         JSON_EXTRACT_SCALAR(breed_json, '$.temperament') AS temperament,
         JSON_EXTRACT_SCALAR(breed_json, '$.life_span') AS life_span,
-        JSON_EXTRACT_SCALAR(breed_json, '$.weight.metric') AS weight_kg,
+        JSON_EXTRACT_SCALAR(breed_json, '$.weight.metric') AS weight_class_kg,
         updated_at AS ingested_at,
         CURRENT_TIMESTAMP() AS dbt_run_at
 
@@ -42,7 +42,7 @@ SELECT
     breed_name,
     temperament,
     life_span,
-    weight_kg,
+    weight_class_kg,
     ingested_at,
     dbt_run_at
 FROM parsed_breeds

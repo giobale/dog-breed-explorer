@@ -21,7 +21,7 @@ weight_normalized AS (
         breed_name,
         temperament,
         life_span,
-        weight_kg,
+        weight_class_kg,
         CAST(
                 (
                 SELECT IF(
@@ -45,7 +45,7 @@ SELECT
     breed_name,
     temperament,
     life_span,
-    weight_kg,
+    weight_class_kg,
     life_span_max_years,
     ingested_at,
     dbt_run_at
