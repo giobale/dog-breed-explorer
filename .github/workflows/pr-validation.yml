@@ -53,9 +53,8 @@ jobs:
       - name: Extract metadata for Docker
         id: meta
         run: |
-          # Use PR number for tagging
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          IMAGE_TAG="europe-west1-docker.pkg.dev/pyne-de-assignemet/cicd-push-repository/dlt-dog-breeds:pr-${PR_NUMBER}"
+          # Use latest tag for simplicity
+          IMAGE_TAG="europe-west1-docker.pkg.dev/pyne-de-assignemet/cicd-push-repository/dlt-dog-breeds:latest"
           echo "tags=${IMAGE_TAG}" >> $GITHUB_OUTPUT
           echo "::notice::Building image with tag: ${IMAGE_TAG}"
 
