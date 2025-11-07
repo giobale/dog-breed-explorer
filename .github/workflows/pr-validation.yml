@@ -18,9 +18,61 @@ on:
 # - GCP_SERVICE_ACCOUNT: Service account email for authentication
 
 jobs:
+  build-and-push-image:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+
+    # Allow GitHub Actions to authenticate with GCP using Workload Identity
+    permissions:
+      contents: read
+      id-token: write
+
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          token_format: access_token
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker europe-west1-docker.pkg.dev
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract metadata for Docker
+        id: meta
+        run: |
+          # Use PR number for tagging
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          IMAGE_TAG="europe-west1-docker.pkg.dev/pyne-de-assignemet/cicd-push-repository/dlt-dog-breeds:pr-${PR_NUMBER}"
+          echo "tags=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "::notice::Building image with tag: ${IMAGE_TAG}"
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./pipelines/dlt-ingestion
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   test-dlt-pipeline:
     name: Test DLT Pipeline
     runs-on: ubuntu-latest
+    needs: build-and-push-image
 
     # Allow GitHub Actions to authenticate with GCP using Workload Identity
     permissions:
