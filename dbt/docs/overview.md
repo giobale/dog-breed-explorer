@@ -100,7 +100,7 @@ dbt docs serve
 SELECT
     breed_name,
     temperament,
-    weight_kg,
+    weight_class_kg,
     life_span_max_years
 FROM dog_breeds_gold.dim_breeds
 ORDER BY life_span_max_years DESC;

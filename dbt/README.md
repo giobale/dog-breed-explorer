@@ -54,7 +54,7 @@ The gold layer contains a single denormalized table:
 │ breed_id (PK)            │
 │ breed_name               │
 │ temperament              │
-│ weight_kg                │
+│ weight_class_kg                │
 │ life_span_max_years      │
 └──────────────────────────┘
 ```
@@ -168,7 +168,7 @@ Opens interactive documentation in your browser with data lineage DAG.
 - `breed_id`: Unique identifier (Primary Key)
 - `breed_name`: Breed name
 - `temperament`: Personality traits
-- `weight_kg`: Weight range in kilograms (string)
+- `weight_class_kg`: Weight range in kilograms (string)
 - `life_span_max_years`: Maximum life span in years (integer)
 
 **Query Examples**:
@@ -178,7 +178,7 @@ Opens interactive documentation in your browser with data lineage DAG.
 SELECT
     breed_name,
     temperament,
-    weight_kg,
+    weight_class_kg,
     life_span_max_years
 FROM dog_breeds_gold.dim_breeds
 ORDER BY life_span_max_years DESC;

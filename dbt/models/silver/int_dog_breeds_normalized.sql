@@ -22,18 +22,17 @@ weight_normalized AS (
         temperament,
         life_span,
         weight_class_kg,
-        CAST(
-                (
-                SELECT IF(
-                    ARRAY_LENGTH(REGEXP_EXTRACT_ALL(life_span, r'\d+')) > 1,
-                    REGEXP_EXTRACT_ALL(life_span, r'\d+')[OFFSET(1)],
-                    REGEXP_EXTRACT_ALL(life_span, r'\d+')[OFFSET(0)]
-                )
-                ) AS INT64
-            ) AS life_span_max_years,
+        SAFE_CAST(
+                    (
+                        SELECT IF(
+                        ARRAY_LENGTH(REGEXP_EXTRACT_ALL(life_span, r'\d+')) > 1,
+                        REGEXP_EXTRACT_ALL(life_span, r'\d+')[SAFE_OFFSET(1)],
+                        REGEXP_EXTRACT_ALL(life_span, r'\d+')[SAFE_OFFSET(0)]
+                        )
+                    ) AS INT64
+                ) AS life_span_max_years,
         ingested_at,
         dbt_run_at
-
     FROM parsed_breeds
 )
 

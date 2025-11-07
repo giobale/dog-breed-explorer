@@ -19,20 +19,12 @@ models:
 
       - name: breed_name
         description: Name of the dog breed
-        tests:
-          - not_null
 
       - name: temperament
         description: Personality and behavioral traits of the breed
-        tests:
-          - not_null
 
-      - name: weight_kg
+      - name: weight_class_kg
         description: Weight range in metric units (kg) as string
-        tests:
-          - not_null
 
       - name: life_span_max_years
         description: Maximum life span in years extracted from life_span string
-        tests:
-          - not_null

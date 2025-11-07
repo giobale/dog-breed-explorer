@@ -63,16 +63,6 @@ snapshots:
   +strategy: timestamp
   +updated_at: updated_at
 
-# Variables that can be referenced in models
-vars:
-  # Weight class boundaries in kg (metric)
-  weight_classes:
-    extra_small: {"min": 0, "max": 5}
-    small: {"min": 5, "max": 10}
-    medium: {"min": 10, "max": 25}
-    large: {"min": 25, "max": 40}
-    extra_large: {"min": 40, "max": 100}
-
 # Query comments for audit trail
 query-comment:
   comment: "dbt_run | {{ dbt_version }} | {{ target.name }} | {{ invocation_id }}"

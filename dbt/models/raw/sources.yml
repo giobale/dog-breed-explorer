@@ -10,8 +10,9 @@ sources:
     database: pyne-de-assignemet
     schema: dog_breeds_raw
 
+    # Ideally we would like to test data source freshness. This check is not implemented as it would not make any sense to put it inside the cicd after the dlt ingesiton
     freshness:
-      warn_after: {count: 10, period: day}
+      warn_after: {count: 10, period: day} 
       error_after: {count: 14, period: day}
 
     loaded_at_field: updated_at
