@@ -50,6 +50,8 @@ ENV PYTHONPATH=/app/src:$PYTHONPATH
 # This ensures dlt looks for .dlt config in the correct location
 WORKDIR /app/src
 
-# Default command runs the pipeline
-CMD ["python", "pipeline.py"]
+# Use direct Python execution - simpler and more reliable for Cloud Run
+# -u flag ensures unbuffered output for Cloud Logging
+ENTRYPOINT ["python", "-u"]
+CMD ["pipeline.py"]
 

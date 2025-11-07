@@ -1,9 +1,18 @@
 # ABOUTME: Main entrypoint for dlt dog breeds pipeline orchestrating data extraction and loading.
 # ABOUTME: Handles configuration loading, pipeline execution, error handling, and logging.
 
-import logging
-import os
 import sys
+import os
+
+# CRITICAL: Print immediately to verify container starts
+print("=" * 80, file=sys.stderr, flush=True)
+print("CONTAINER STARTING - Python script loaded", file=sys.stderr, flush=True)
+print(f"Python version: {sys.version}", file=sys.stderr, flush=True)
+print(f"Working directory: {os.getcwd()}", file=sys.stderr, flush=True)
+print(f"GCP_PROJECT_ID: {os.getenv('GCP_PROJECT_ID')}", file=sys.stderr, flush=True)
+print("=" * 80, file=sys.stderr, flush=True)
+
+import logging
 from typing import Dict, Any
 
 import dlt
@@ -14,7 +23,7 @@ from sources.api_source import dog_breeds_source
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)],
+    handlers=[logging.StreamHandler(sys.stderr)],  # Use stderr for Cloud Run
 )
 
 logger = logging.getLogger(__name__)
@@ -38,39 +47,23 @@ def run_pipeline() -> Dict[str, Any]:
 
         logger.info(f"Fetching data from: {config.full_api_url}")
 
-        # Configure BigQuery credentials from service account JSON file
-        credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-        if credentials_path:
-            logger.info(f"Using BigQuery credentials from: {credentials_path}")
+        # Configure BigQuery credentials
+        # In Cloud Run: Uses the service account attached to the job via ADC
+        # Locally: Uses gcloud auth application-default login or GOOGLE_APPLICATION_CREDENTIALS
+        logger.info("Creating pipeline with Application Default Credentials (ADC)")
 
-            # Read and parse the service account JSON file
-            import json
-            with open(credentials_path, 'r') as f:
-                creds_dict = json.load(f)
+        # When running on Cloud Run with ADC, dlt needs explicit project_id
+        # This allows dlt to work with compute engine credentials
+        pipeline = dlt.pipeline(
+            pipeline_name="dog_breeds_pipeline",
+            destination=dlt.destinations.bigquery(
+                location="US",  # BigQuery location
+                project_id=config.bigquery_project_id  # Required for Cloud Run ADC
+            ),
+            dataset_name=config.bigquery_dataset,
+        )
 
-            # Create dlt credentials object from the JSON
-            from dlt.common.configuration.specs import GcpServiceAccountCredentials
-            credentials = GcpServiceAccountCredentials(
-                project_id=creds_dict['project_id'],
-                private_key=creds_dict['private_key'],
-                client_email=creds_dict['client_email']
-            )
-
-            # Create pipeline with explicit credentials
-            pipeline = dlt.pipeline(
-                pipeline_name="dog_breeds_pipeline",
-                destination=dlt.destinations.bigquery(credentials=credentials),
-                dataset_name=config.bigquery_dataset,
-            )
-        else:
-            logger.info("Using default BigQuery credentials (ADC)")
-            # Create pipeline without explicit credentials (uses ADC)
-            pipeline = dlt.pipeline(
-                pipeline_name="dog_breeds_pipeline",
-                destination="bigquery",
-                dataset_name=config.bigquery_dataset,
-            )
-
+        logger.info(f"Pipeline created - will use ADC from environment")
         logger.info(f"Pipeline will create dataset '{config.bigquery_dataset}' if it doesn't exist")
 
         #returns the dog_breeds_resource generator.

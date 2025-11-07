@@ -9,7 +9,7 @@ variable "project_id" {
 variable "region" {
   description = "GCP region for resources"
   type        = string
-  default     = "us-central1"
+  default     = "europe-west1"
 }
 
 # Service Account for DLT pipeline
@@ -42,12 +42,17 @@ variable "github_actions_service_account_email" {
 variable "dlt_service_account_email" {
   description = "Service account email for DLT Cloud Run jobs"
   type        = string
-  default     = ""
 }
 
 # DLT container image (for Cloud Run jobs)
 variable "dlt_container_image" {
-  description = "Container image URL for DLT pipeline"
+  description = "Container image URL for DLT pipeline in Artifact Registry"
   type        = string
-  default     = ""
+}
+
+# DLT schedule (cron format)
+variable "dlt_schedule" {
+  description = "Cron schedule for Cloud Scheduler (default: every Monday at 9 AM UTC)"
+  type        = string
+  default     = "0 9 * * 1"
 }
