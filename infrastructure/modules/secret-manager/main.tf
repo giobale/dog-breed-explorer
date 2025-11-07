@@ -98,3 +98,19 @@ resource "google_artifact_registry_repository_iam_member" "github_actions_writer
   role       = "roles/artifactregistry.writer"
   member     = "serviceAccount:${var.github_actions_service_account_email}"
 }
+
+# Grant GitHub Actions service account BigQuery permissions for dbt operations
+# This role includes: jobs.create, datasets.get, tables.create/update/delete/getData
+resource "google_project_iam_member" "github_actions_bigquery_data_editor" {
+  project = var.project_id
+  role    = "roles/bigquery.dataEditor"
+  member  = "serviceAccount:${var.github_actions_service_account_email}"
+}
+
+# Grant GitHub Actions service account BigQuery User role for job creation
+# This role includes: jobs.create, jobs.get, jobs.list
+resource "google_project_iam_member" "github_actions_bigquery_user" {
+  project = var.project_id
+  role    = "roles/bigquery.user"
+  member  = "serviceAccount:${var.github_actions_service_account_email}"
+}

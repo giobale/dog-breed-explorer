@@ -205,6 +205,12 @@ jobs:
         env:
           DBT_PROFILES_DIR: ${{ github.workspace }}/.dbt
 
+      - name: Install dbt dependencies
+        run: |
+          dbt deps
+        env:
+          DBT_PROFILES_DIR: ${{ github.workspace }}/.dbt
+
       - name: Run dbt models
         run: |
           dbt run
