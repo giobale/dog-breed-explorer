@@ -31,9 +31,6 @@ class PipelineConfig:
 
         Returns:
             PipelineConfig: Configuration object populated from environment.
-
-        Raises:
-            ValueError: If required environment variables are missing.
         """
         try:
             # Calculate project root: src/config.py -> src -> dlt-ingestion -> pipelines -> dog-breed-explorer
