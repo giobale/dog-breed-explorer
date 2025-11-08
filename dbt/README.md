@@ -277,6 +277,11 @@ dbt ls --select +dim_breeds --resource-type model
 - Silver models go to `dog_breeds_silver` (not `dog_breeds_raw_dog_breeds_silver`)
 - Gold model goes to `dog_breeds_gold`
 
+### Package Installation Errors
+- If you see errors about missing `dbt_project.yml` in packages or corrupted package directories
+- Clean and reinstall packages: `rm -rf dbt_packages/ && dbt deps`
+- Run it whenever you update `packages.yml` or encounter package errors
+
 ## Timestamps
 
 All models include:

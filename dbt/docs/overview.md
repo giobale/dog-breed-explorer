@@ -22,8 +22,9 @@ Silver Layer (Intermediate Views)
     ├── int_dog_breeds_parsed
     └── int_dog_breeds_normalized
     ↓
-Gold Layer (Analytics Table)
-    └── dim_breeds
+Gold Layer (Analytics Tables)
+    ├── dim_breeds
+    └── breed_temperaments
 ```
 
 ### Layer Descriptions
@@ -41,8 +42,8 @@ Gold Layer (Analytics Table)
 
 **Gold Layer (Analytics)**
 - Dataset: `dog_breeds_gold`
-- Materialized as **table** for query performance
-- Denormalized breed information table
+- Materialized as **tables** for query performance
+- Denormalized breed information and normalized temperament mappings
 - Optimized for analytical queries and BI tools
 
 ## Key Models
@@ -60,6 +61,9 @@ Extracts maximum life span in years from the life_span string field using regex 
 - Weight ranges in kilograms
 - Maximum life span in years
 - All metrics in a single denormalized table for easy analysis
+
+### breed_temperaments
+**Normalized temperament mapping table** that splits comma-separated temperament traits into individual rows. Each row represents one temperament trait for a breed, enabling filtered analysis by specific temperament characteristics.
 
 ## Data Quality & Testing
 

@@ -12,6 +12,7 @@ dim_breeds AS (
     SELECT
         breed_id,
         breed_name,
+        breed_group,
         temperament,
         weight_class_kg,
         life_span_max_years
@@ -19,3 +20,4 @@ dim_breeds AS (
 )
 SELECT *
 FROM dim_breeds
+

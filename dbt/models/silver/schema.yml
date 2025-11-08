@@ -7,9 +7,7 @@ models:
   - name: int_dog_breeds_parsed
     description: >
       Intermediate model that extracts structured fields from the raw JSON breed data.
-      Parses essential breed attributes including identifiers, name, temperament,
-      life span, and weight into separate columns for downstream processing.
-
+      
     columns:
       - name: row_id
         description: Unique row identifier from the source table
@@ -64,9 +62,8 @@ models:
   - name: int_dog_breeds_normalized
     description: >
       Intermediate model that extracts maximum life span in years from the
-      life_span string field. Provides normalized numeric life span data
-      for analytical queries and aggregations.
-
+      life_span string field. 
+      
     columns:
       - name: row_id
         description: Unique row identifier from the source table

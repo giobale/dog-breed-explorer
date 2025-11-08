@@ -6,9 +6,7 @@ version: 2
 models:
   - name: dim_breeds
     description: >
-      Gold layer analytics table containing comprehensive breed information.
-      Combines breed identifiers, names, temperament, weight, and life span
-      metrics in a single denormalized table for easy querying and analysis.
+      Table containing comprehensive breed information. It has one row per dog breed.
 
     columns:
       - name: breed_id
@@ -28,3 +26,19 @@ models:
 
       - name: life_span_max_years
         description: Maximum life span in years extracted from life_span string
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 3
+              max_value: 30
+
+  - name: breed_temperaments
+    description: >
+      Normalized breed-temperament mapping table. Each row represents a single
+      temperament trait for a breed.
+
+    columns:
+      - name: breed_id
+        description: Unique identifier for the breed from the Dog API
+
+      - name: temperament
+        description: Individual temperament trait for the breed
