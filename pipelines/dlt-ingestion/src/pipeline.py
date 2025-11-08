@@ -35,9 +35,6 @@ def run_pipeline() -> Dict[str, Any]:
 
     Returns:
         Dictionary containing pipeline execution results and metrics.
-
-    Raises:
-        Exception: If pipeline execution fails.
     """
     try:
         logger.info("Starting dog breeds data pipeline")
