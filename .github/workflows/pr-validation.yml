@@ -25,6 +25,9 @@ jobs:
   detect-changes:
     name: Detect Changed Files
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     outputs:
       dlt: ${{ steps.filter.outputs.dlt }}
       dbt: ${{ steps.filter.outputs.dbt }}
