@@ -4,8 +4,7 @@ sources:
   - name: dog_breeds_raw
     description: >
       Raw dog breed data ingested from the Dog API via dlt pipelines.
-      Contains JSON-formatted breed information including physical characteristics,
-      temperament, and metadata. This is the bronze layer in our medallion architecture.
+      Contains JSON-formatted breed information. This is the bronze layer in our medallion architecture.
 
     database: pyne-de-assignemet
     schema: dog_breeds_raw

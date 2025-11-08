@@ -189,7 +189,7 @@ jobs:
     name: Run dbt Models and Tests
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.dbt == 'true'
+    if: needs.detect-changes.outputs.dbt == 'true' || needs.detect-changes.outputs.dlt == 'true'
 
     # Allow GitHub Actions to authenticate with GCP using Workload Identity
     permissions:
