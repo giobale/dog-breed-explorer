@@ -10,7 +10,10 @@ on:
       - master
     paths:
       - 'pipelines/dlt-ingestion/**'
+      - 'dbt/**'
       - '.github/workflows/pr-validation.yml'
+      - '!pipelines/dlt-ingestion/README.md'
+      - '!dbt/**/*.md'
 
 # Required secrets (configured in GitHub repo settings):
 # - GCP_PROJECT_ID: Google Cloud Project ID
@@ -19,60 +22,35 @@ on:
 # - DBT_PROFILES_YML: dbt profiles.yml content configured for oauth method with Workload Identity
 
 jobs:
-  build-and-push-image:
-    name: Build and Push Docker Image
+  detect-changes:
+    name: Detect Changed Files
     runs-on: ubuntu-latest
-
-    # Allow GitHub Actions to authenticate with GCP using Workload Identity
-    permissions:
-      contents: read
-      id-token: write
-
     outputs:
-      image-tag: ${{ steps.meta.outputs.tags }}
-
+      dlt: ${{ steps.filter.outputs.dlt }}
+      dbt: ${{ steps.filter.outputs.dbt }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+      - name: Check for file changes
+        uses: dorny/paths-filter@v3
+        id: filter
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-          token_format: access_token
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-
-      - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker europe-west1-docker.pkg.dev
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Extract metadata for Docker
-        id: meta
-        run: |
-          # Use latest tag for simplicity
-          IMAGE_TAG="europe-west1-docker.pkg.dev/pyne-de-assignemet/cicd-push-repository/dlt-dog-breeds:latest"
-          echo "tags=${IMAGE_TAG}" >> $GITHUB_OUTPUT
-          echo "::notice::Building image with tag: ${IMAGE_TAG}"
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./pipelines/dlt-ingestion
-          platforms: linux/amd64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          filters: |
+            dlt:
+              - 'pipelines/dlt-ingestion/**'
+              - '!pipelines/dlt-ingestion/README.md'
+              - '.github/workflows/pr-validation.yml'
+            dbt:
+              - 'dbt/**'
+              - '!dbt/**/*.md'
+              - '.github/workflows/pr-validation.yml'
 
   test-dlt-pipeline:
     name: Test DLT Pipeline
     runs-on: ubuntu-latest
-    needs: build-and-push-image
+    needs: detect-changes
+    if: needs.detect-changes.outputs.dlt == 'true'
 
     # Allow GitHub Actions to authenticate with GCP using Workload Identity
     permissions:
@@ -152,10 +130,63 @@ jobs:
         run: |
           echo "::notice::DLT pipeline tests completed for PR #${{ github.event.pull_request.number }}"
 
+  build-and-push-image:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    needs: [detect-changes, test-dlt-pipeline]
+    if: needs.detect-changes.outputs.dlt == 'true'
+
+    # Allow GitHub Actions to authenticate with GCP using Workload Identity
+    permissions:
+      contents: read
+      id-token: write
+
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          token_format: access_token
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker europe-west1-docker.pkg.dev
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract metadata for Docker
+        id: meta
+        run: |
+          # Use latest tag for simplicity
+          IMAGE_TAG="europe-west1-docker.pkg.dev/pyne-de-assignemet/cicd-push-repository/dlt-dog-breeds:latest"
+          echo "tags=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "::notice::Building image with tag: ${IMAGE_TAG}"
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./pipelines/dlt-ingestion
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   dbt-run-and-test:
     name: Run dbt Models and Tests
     runs-on: ubuntu-latest
-    needs: test-dlt-pipeline
+    needs: detect-changes
+    if: needs.detect-changes.outputs.dbt == 'true'
 
     # Allow GitHub Actions to authenticate with GCP using Workload Identity
     permissions:
