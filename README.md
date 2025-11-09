@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project implements a production-ready, serverless data platform on Google Cloud Platform that extracts dog breed data from TheDogAPI, loads it into BigQuery, and transforms it using dbt locally or inside CI/CD workflow.
+This project implements a serverless data platform on Google Cloud Platform that extracts dog breed data from TheDogAPI, loads it into BigQuery, and transforms it using dbt locally or inside CI/CD workflow.
 
 ## Looker Studio Results
 

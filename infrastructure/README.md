@@ -144,7 +144,7 @@ terraform init
 Preview the infrastructure changes:
 
 ```bash
-terraform plan -var-file="secrets.tfvars"
+terraform plan -var-file="secrets.tfvars" -var="project_id=pyne-de-assignemet"
 ```
 
 ### Apply Configuration
@@ -152,7 +152,7 @@ terraform plan -var-file="secrets.tfvars"
 Deploy the infrastructure:
 
 ```bash
-terraform apply -var-file="secrets.tfvars"
+terraform apply -var-file="secrets.tfvars" -var="project_id=pyne-de-assignemet"
 ```
 
 Type `yes` when prompted to confirm the changes.
