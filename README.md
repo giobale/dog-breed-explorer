@@ -14,6 +14,8 @@ The dashboard visualizes the transformed data from the analytics layer, showcasi
 
 ## Technologies
 
+![Pipeline Diagram](imgs/PipelineDiagram.png)
+
 - **Data Ingestion**: dlt (data load tool), Python 3.11
 - **Data Warehouse**: Google BigQuery
 - **Data Transformation**: dbt (data build tool)
@@ -163,14 +165,6 @@ The GitHub Actions workflow (`.github/workflows/pr-validation.yml`) automates va
 7. **Run dbt Models** - Transforms data and validates with dbt tests
 8. **Cleanup** - Deletes PR-specific dataset and resources
 
-### Key Features
-
-- **Keyless Authentication** - Workload Identity Federation eliminates stored credentials
-- **Isolated Testing** - Each PR gets its own BigQuery dataset
-- **Automated Cleanup** - Test resources are deleted after workflow completes
-- **Comprehensive Validation** - Builds, tests, and validates entire pipeline
-- **Secret Management** - All credentials retrieved from Secret Manager at runtime
-
 **See**: [Secrets and Authentication](docs/SECRETS_AND_AUTHENTICATION.md) for Workload Identity setup.
 
 ## Documentation
@@ -231,7 +225,7 @@ gcloud run jobs execute dlt-dog-breeds-ingestion \
 
 ## Data Transformation with dbt
 
-After the data ingestion pipeline has loaded raw data into BigQuery, use dbt to transform and refine the data through the medallion architecture layers (raw → staging → marts).
+After the data ingestion pipeline has loaded raw data into BigQuery, use dbt to transform and refine the data through the medallion architecture layers (raw → silver → gold).
 
 **See**: [dbt README](dbt/README.md) for complete instructions on running dbt models locally and understanding the transformation logic.
 
