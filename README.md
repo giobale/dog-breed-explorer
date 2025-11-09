@@ -229,3 +229,12 @@ After the data ingestion pipeline has loaded raw data into BigQuery, use dbt to 
 
 **See**: [dbt README](dbt/README.md) for complete instructions on running dbt models locally and understanding the transformation logic.
 
+## Future Implementations
+
+- **IAM Security Hardening** - Apply least-privilege principles to service account roles; currently service accounts use overly broad permissions
+- **Service Account Separation** - Create dedicated service accounts for dlt pipeline and Terraform operations with scoped permissions
+- **Image Build Optimization** - Implement Docker layer caching to reduce CI/CD build times
+- **Artifact Registry Lifecycle Management** - Add automated cleanup policies to remove old or untagged container images
+- **Environment Isolation** - Establish separate testing environment with dedicated datasets and infrastructure for production isolation
+- **Multi-Environment dbt** - Parameterize dbt executions by target environment (dev, test, prod) for environment-specific transformations
+
