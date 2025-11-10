@@ -41,11 +41,17 @@ jobs:
         with:
           filters: |
             dlt:
-              - 'pipelines/dlt-ingestion/**'
-              - '!pipelines/dlt-ingestion/**/*.md'
+              - 'pipelines/dlt-ingestion/**/*.py'
+              - 'pipelines/dlt-ingestion/**/*.txt'
+              - 'pipelines/dlt-ingestion/**/*.yml'
+              - 'pipelines/dlt-ingestion/**/*.yaml'
+              - 'pipelines/dlt-ingestion/Dockerfile'
+              - 'pipelines/dlt-ingestion/.dockerignore'
             dbt:
-              - 'dbt/**'
-              - '!dbt/**/*.md'
+              - 'dbt/**/*.sql'
+              - 'dbt/**/*.yml'
+              - 'dbt/**/*.yaml'
+              - 'dbt/dbt_project.yml'
 
   test-dlt-pipeline:
     name: Test DLT Pipeline
