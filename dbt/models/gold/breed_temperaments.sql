@@ -4,7 +4,7 @@
     tags=['gold']
   )
 }}
-
+-- this should trigger only the dbt job in cicd
 SELECT DISTINCT
   breed_id,
   TRIM(trait) AS temperament
