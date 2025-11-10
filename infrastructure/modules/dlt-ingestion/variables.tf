@@ -31,13 +31,13 @@ variable "job_name" {
 variable "scheduler_name" {
   description = "Name of the Cloud Scheduler job"
   type        = string
-  default     = "dlt-dog-breeds-weekly-trigger"
+  default     = "dlt-dog-breeds-trigger"
 }
 
 variable "schedule" {
   description = "Cron schedule for Cloud Scheduler (default: every Monday at 9 AM UTC)"
   type        = string
-  default     = "0 9 * * 1"
+  default     = "0 2 * * 1"
 }
 
 variable "time_zone" {
