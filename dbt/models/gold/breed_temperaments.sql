@@ -4,7 +4,7 @@
     tags=['gold']
   )
 }}
-
+-- trigger cicd
 SELECT DISTINCT
   breed_id,
   TRIM(trait) AS temperament
