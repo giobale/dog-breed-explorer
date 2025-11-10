@@ -44,6 +44,7 @@ jobs:
               - 'pipelines/dlt-ingestion/**'
               - '!pipelines/dlt-ingestion/README.md'
               - '.github/workflows/pr-validation.yml'
+              - '!dbt/**'
             dbt:
               - 'dbt/**'
               - '!dbt/**/*.md'
