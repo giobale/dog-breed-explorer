@@ -3,7 +3,7 @@
 
 import sys
 import os
-# trigger cicd
+
 # CRITICAL: Print immediately to verify container starts
 print("=" * 80, file=sys.stderr, flush=True)
 print("CONTAINER STARTING - Python script loaded", file=sys.stderr, flush=True)
